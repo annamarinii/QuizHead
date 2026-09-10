@@ -601,6 +601,25 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
   animation: pulse 1s steps(2, jump-none) infinite;
 }
 
+.play__cat {
+  margin: 0;
+  padding: 7px 15px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .3);
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* il mimo è l'unica categoria in cui l'etichetta è un ordine, non un indizio */
+.play__cat.is-action {
+  background: color-mix(in srgb, var(--accent-2) 24%, transparent);
+  border-color: color-mix(in srgb, var(--accent-2) 65%, transparent);
+  color: var(--text);
+}
+
 .play__word {
   margin: 0;
   max-width: 15ch;

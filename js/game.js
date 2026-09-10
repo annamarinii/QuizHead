@@ -43,6 +43,7 @@
   var countNum    = $('#count-num');
   var hudTimer    = $('#hud-timer');
   var hudScore    = $('#hud-score');
+  var catEl       = $('#play-cat');
   var wordEl      = $('#play-word');
   var verdictEl   = $('#play-verdict');
   var manualBox   = $('#manual');
@@ -213,8 +214,15 @@
 
   /* --------------------------------------------------------------- deck -- */
 
+  /* Ogni voce del mazzo si porta dietro la sua categoria: mescolate insieme,
+     "Guidare" da sola non dice se va raccontata o mimata. */
   function buildPool() {
     var bank = (window.QuizHead && window.QuizHead.words) || {};
+    var meta = {};
+    ((window.QuizHead && window.QuizHead.CATEGORIES) || []).forEach(function (c) {
+      meta[c.id] = c;
+    });
+
     var seen = {};
     pool = [];
 
@@ -224,8 +232,9 @@
         console.warn('[QuizHead] nessuna parola per la categoria "' + id + '"');
         return;
       }
+      var cat = meta[id] || { id: id, label: id, icon: '' };
       list.forEach(function (w) {
-        if (!seen[w]) { seen[w] = true; pool.push(w); }
+        if (!seen[w]) { seen[w] = true; pool.push({ word: w, cat: cat }); }
       });
     });
 
@@ -249,8 +258,15 @@
 
   function nextWord() {
     current = drawWord();
-    wordEl.textContent = current;
-    wordEl.dataset.len = sizeClass(current);
+
+    // Per il mimo l'etichetta non è un indizio ma l'istruzione: va urlata.
+    var isMime = current.cat.id === 'mimo';
+    catEl.textContent = (current.cat.icon ? current.cat.icon + ' ' : '') +
+                        (isMime ? 'Mimo — non parlare' : current.cat.label);
+    catEl.classList.toggle('is-action', isMime);
+
+    wordEl.textContent = current.word;
+    wordEl.dataset.len = sizeClass(current.word);
   }
 
   function answer(hit) {
@@ -258,7 +274,7 @@
 
     locked = true;
     var team = teams[turn];
-    team.words.push({ word: current, hit: hit });
+    team.words.push({ word: current.word, hit: hit });
     if (hit) { team.score++; team.roundScore++; }
 
     hudScore.textContent = team.roundScore;

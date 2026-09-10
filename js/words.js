@@ -12,20 +12,20 @@ window.QuizHead.words = {
   storia: [
     "Rivoluzione Francese", "Impero Romano", "Giulio Cesare", "Napoleone Bonaparte",
     "Rosa Parks", "Prima Guerra Mondiale", "Seconda Guerra Mondiale", "Guerra Fredda",
-    "Caduta del Muro di Berlino", "Cristoforo Colombo", "Charles Dickens", "Medioevo",
+    "Caduta del Muro di Berlino", "Pipino Il Breve", "Cristoforo Colombo", "Charles Dickens", "Medioevo",
     "Mao Zedong", "Fascismo", "Marco Polo", "Leonardo da Vinci",
-    "Crociate", "Peste", "Magna Carta", "Rivoluzione Industriale",
+    "Crociate", "Peste", "J.F. Kennedy", "Rivoluzione Industriale",
     "Leonardo da Vinci", "Piano Marshall", "Risorgimento", "Napoleone",
-    "Camillo Benso di Cavour", "Unità d'Italia", "Benito Mussolini", "Adolf Hitler",
+    "11 settembre 2001", "Unità d'Italia", "Benito Mussolini", "Adolf Hitler",
     "Resistenza partigiana", "25 Aprile", "Albert Einstein", "Hiroshima",
     "Neil Armstrong", "Romolo e Remo", "Mahatma Gandhi",
     "Martin Luther King", "Nelson Mandela", "Dante Alighieri", "Guerra del Vietnam",
     "Rivoluzione Russa", "Lenin", "Stalin", "Franklin D. Roosevelt", "Titanic",
-    "Grande Depressione", "Alessandro Magno", "Potenze dell'Asse", "Martin Lutero", "Riforma Protestante",
+    "Caccia alle streghe", "Alessandro Magno", "Potenze dell'Asse", "Martin Lutero", "Riforma Protestante",
     "Attila", "Carlo Magno", "Sacro Romano Impero", "Big Bang",
     "Scoperta dell'America", "Papa Francesco", "Guerra dei Cent'anni",
-    "Giovanna d'Arco", "Anarchia", "Colosseo", "Via della Seta",
-    "Trattato di Versailles", "Proibizionismo"
+    "Giovanna d'Arco", "Anarchia", "Colosseo", "Guerra di Troia", "Omero", "Virgilio",
+    "Trattato di Versailles", "Proibizionismo", "Re Sole", "Disfatta di Caporetto", "Wolfgang Amadeus Mozart", "Ludwig van Beethoven", "Pablo Picasso", "Vincent van Gogh", "Claude Monet", "Edvard Munch"
   ],
 
   /* ---------------------------------------------------------- filosofia -- */
@@ -40,8 +40,7 @@ window.QuizHead.words = {
     "Buddismo", "Meditazione", "Inconscio", "Complesso di Edipo", "The Truman Show", 
     "Il superuomo", "Dei dell'Olimpo", "Déjà vu", 
     "Dilemma morale", "Comunismo", "Capitalismo", "Ragione", 
-    "Istinto", "Filosofia Orientale", "Zen", "Mantra", 
-    "Ottimismo", "Cinismo", "Empatia", "Etica", "Dio è morto"
+    "Istinto","Ottimismo", "Cinismo", "Empatia", "Etica"
   ],
 
   /* ---------------------------------------------------------- anatomia --- */
@@ -66,15 +65,10 @@ window.QuizHead.words = {
     "Papille gustative",
 
     // Reparto goliardico: sempre anatomia, ma di quella che fa ridere.
-    "Sborra", "Scoreggia", "Rutto", "Caccola", "Moccio",
-    "Cerume", "Catarro", "Brufolo", "Punto nero", "Forfora",
-    "Sudore", "Alito pesante", "Piedi puzzolenti", "Ascella", "Doppio mento", "Cellulite",
-    "Smagliature", "Emorroidi", "Prostata", "Testicoli", "Scroto", "Pene",
-    "Peli pubici", "Clitoride", "Utero", "Ovaie", "Mestruazioni", "Erezione",
-    "Sperma", "Placenta", "Cordone ombelicale", "Ombelico", "Capezzolo",
-    "Chiappe", "Sfintere", "Ano", "Coccige", "Ugola", "Tonsille", "Appendice",
-    "Singhiozzo", "Starnuto", "Sbadiglio", "Pelle d'oca", "Crampo notturno",
-    "Livido", "Callo", "Unghia incarnita", "Verruca", "Peluria"
+    "Sburra", "Scoreggia", "Rutto", "Caccola", "Moccio", "Ascella", "Doppio mento", "Cellulite",
+    "Smagliature", "Emorroidi", "Prostata", "Testicoli", "Pene", "Placenta", "Cordone ombelicale",
+    "Ombelico", "Capezzolo", "Chiappe", "Ano", "Coccige", "Singhiozzo", "Pelle d'oca",
+    "Livido", "Callo", "Verruca", "Peluria"
   ],
 
   /* ----------------------------------------------------------- scienze --- */
@@ -113,7 +107,7 @@ window.QuizHead.words = {
   mimo: [
     "Fare squat", "Guidare", "Lavarsi i denti", "Suonare la chitarra", "Mescolare",
     "Nuotare a rana", "Fare le valigie",
-    "Infilare il filo nell'ago", "Mangiare gli spaghetti",
+    "Infilare il filo nell'ago", "Fare la cacca",
     "Aprire una bottiglia di vino", "Fare una foto di gruppo", "Stirare",
     "Salire le scale", "Fare surf",
     "Scalare una montagna", "Pescare", "Giocare a tennis", "Fare la ruota", "Truccarsi",
@@ -121,7 +115,7 @@ window.QuizHead.words = {
     "Passare l'aspirapolvere", "Innaffiare le piante", "Sbucciare una banana",
     "Bere un caffè", "Fare le bolle di sapone",
     "Dirigere un'orchestra", "Fare karate",
-    "Scivolare", "Spegnere la sveglia la mattina", "Fare yoga", "Mungere una mucca",
+    "Scivolare", "Spegnere la sveglia", "Fare yoga", "Mungere una mucca",
     "Remare in barca", "Andare in bici in salita", "Giocare a bowling",
     "Lanciare le freccette",
     "Fare la fila alle poste", "Mangiare un gelato che si scioglie",
@@ -132,40 +126,17 @@ window.QuizHead.words = {
   /* ----------------------------------------------------------- canzoni --- */
   // Lista chiusa, fornita a mano: sostituisce del tutto quella generata.
   canzoni: [
-    "Blurred Lines", "Daddy Cool", "DAVVERODAVVERO", "Boss", "OSSESSIONE",
-    "Non la Sopporto", "PA QUE LO BAILES (BAILALO ROCKY)", "Rock That Body",
-    "Miami Vice", "DEM", "TOP G", "Lo stelliere", "Massafghanistan",
-    "AYAHUASCA", "Lo Stadio", "Stupida sfortuna", "STUPIDA",
-    "SOGNO AMERICANO", "Afro Trap Pt. 7 (La puissance)",
-    "Afro Trap Pt. 3 (Champions League)", "Gangnam Style", "Bam Bam",
+    "Daddy Cool", "DAVVERODAVVERO", "Gangnam Style", "Bam Bam",
     "Kriminal", "S.P.Q.R.", "Marina", "Andiamo A Comandare",
-    "Maledetta primavera", "Roma - Bangkok", "Perdo le parole", "Maracanã",
-    "El Party", "Magnifico", "Senza Pagare VS T-Pain", "Vorrei ma non posto",
-    "Tranne Te", "MIU MIU", "TT LE GIRLZ", "Espresso Macchiato", "Lola",
-    "Che Ne Sanno I 2000", "50 Special", "Gli anni (96)",
+    "Maledetta primavera", "Roma - Bangkok", "Maracanã",
+    "Magnifico", "Senza Pagare VS T-Pain", "Vorrei ma non posto",
+    "Tranne Te", "MIU MIU", "TT LE GIRLZ", "Che Ne Sanno I 2000", "50 Special", "Gli anni (96)",
     "Il Più Grande Spettacolo Dopo Il Big Bang", "Un Raggio Di Sole",
-    "Baciami Ancora", "Rozzi", "Auto tedesca", "Albachiara", "Sally",
-    "ADVICE", "Non è Easy", "Stavo Pensando A Te", "Le Donne", "BTX Posse",
-    "VAI DISA!", "Insta Lova", "La Nuova Stella Di Broadway", "Portofino",
-    "Pettinero", "Settimana Bianca", "Tessera sanitaria",
-    "Wellerman - Sea Shanty", "BIANCA", "BAMBOLA", "Più bella cosa",
-    "Sere nere", "il ritmo delle cose.", "Apparecchiato", "CAFFÈ AMARO",
-    "MILANO TESTAROSSA", "Gotham", "TU CON CHI FAI L'AMORE", "Call Me Maybe",
+    "Rozzi", "Auto tedesca", "Gotham", "TU CON CHI FAI L'AMORE", "Call Me Maybe",
     "Set Fire to the Rain", "Someone Like You", "Skyfall", "Smack That",
-    "Gimme More", "Beauty And A Beat", "I Kissed A Girl", "Hot N Cold",
+    "Gimme More", "I Kissed A Girl", "Hot N Cold",
     "Teenage Dream", "Last Friday Night (T.G.I.F.)", "Firework",
-    "The One That Got Away",
-
-    // Grandi classici: quelli che parte a canticchiarli anche chi non li sa.
-    "Volare", "Azzurro", "L'italiano", "Bella ciao", "Con te partirò",
-    "Sarà perché ti amo", "Maracaibo", "Gloria", "Felicità",
-    "Vita spericolata", "La canzone del sole", "Vamos a la playa",
-    "L'estate sta finendo", "Notti magiche", "La solitudine", "Laura non c'è",
-    "Bohemian Rhapsody", "Imagine", "Hey Jude", "Billie Jean", "Thriller",
-    "Wonderwall", "Smells Like Teen Spirit", "Sweet Child O' Mine",
-    "Hotel California", "I Will Survive", "Dancing Queen", "Y.M.C.A.",
-    "Sweet Caroline", "Africa", "Take On Me", "Never Gonna Give You Up",
-    "We Will Rock You", "Macarena"
+    "The One That Got Away", "California Gurls", "All I want for Christmas Is You"
   ],
 
   /* ----------------------------------------------------------- persone --- */
@@ -180,10 +151,10 @@ window.QuizHead.words = {
     "Bene sorella Mila", "Carlotta sorella Mila", "Bumba", "Luciano Bellet",
     "Aurora Borsoi", "Clara Vicari", "Davide Faccio (Casarin)",
     "Vassallo/Valvassore", "Matteo Mattia M&M's (Gold)", "Marino Marini",
-    "PAOLO FUOCO", "Sara ex Granzi",
+    "PAOLO FUOCO", "Sara ex Granzi", "Francesco Gabbani", "Alfonso Signorini",
 
     // Personaggi pubblici (cronaca e politica).
     "Berlusconi", "Salvini", "Schlein", "P Diddy", "Epstein", "Bossetti",
-    "Yara Gambirasio", "Filippo Turetta"
+    "Yara Gambirasio", "Filippo Turetta", "Trump"
   ]
 };
