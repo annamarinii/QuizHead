@@ -44,17 +44,8 @@
           </div>
         </div>
 
-        <div class="stepper" data-stepper="players" data-min="1" data-max="10">
-          <div class="stepper__meta">
-            <span class="stepper__label">Giocatori per squadra</span>
-            <span class="stepper__hint">min 1 · max 10</span>
-          </div>
-          <div class="stepper__controls">
-            <button type="button" class="stepper__btn" data-step="-1" aria-label="Diminuisci giocatori per squadra">−</button>
-            <output class="stepper__value" id="out-players" aria-live="polite">3</output>
-            <button type="button" class="stepper__btn" data-step="1" aria-label="Aumenta giocatori per squadra">+</button>
-          </div>
-        </div>
+        <div class="rosters" id="rosters"><!-- generato da js/app.js --></div>
+        <p class="card__note" id="rounds-note"></p>
       </section>
 
       <!-- Timer -->
@@ -110,8 +101,9 @@
 
       <!-- A · pronti -->
       <section class="view" id="view-ready">
-        <p class="view__eyebrow">Tocca a</p>
+        <p class="view__eyebrow" id="ready-round">Giro 1 di 3</p>
         <h2 class="view__team" id="ready-team">Squadra 1</h2>
+        <p class="view__player">al telefono: <strong id="ready-player">Marta</strong></p>
         <p class="view__hint">
           Telefono in orizzontale sulla fronte.<br>
           Inclina <strong class="t-hit">in avanti</strong> se indovini,
@@ -145,19 +137,19 @@
 
       <!-- D · fine turno -->
       <section class="view" id="view-result" hidden>
-        <p class="view__eyebrow">Turno finito</p>
+        <p class="view__eyebrow" id="result-player">Turno di Marta</p>
         <h2 class="view__team" id="result-team">Squadra 1</h2>
-        <p class="result__score"><strong id="result-score">0</strong> punti</p>
+        <p class="result__score"><strong id="result-score">0</strong> punti in questo turno</p>
         <ul class="wordlist" id="result-list"></ul>
         <div class="view__actions">
           <button type="button" class="btn btn--primary" id="btn-next">Avanti</button>
         </div>
       </section>
 
-      <!-- E · classifica -->
+      <!-- E · classifica (parziale a fine giro, finale a fine partita) -->
       <section class="view" id="view-final" hidden>
-        <p class="view__eyebrow">Partita finita</p>
-        <h2 class="view__team">Classifica</h2>
+        <p class="view__eyebrow" id="final-eyebrow">Partita finita</p>
+        <h2 class="view__team" id="final-title">Classifica</h2>
         <ol class="leaderboard" id="leaderboard"></ol>
         <div class="view__actions">
           <button type="button" class="btn btn--primary" id="btn-again">Rigioca</button>

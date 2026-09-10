@@ -33,7 +33,13 @@
     final:  $('#view-final')
   };
 
+  var readyRound  = $('#ready-round');
   var readyTeam   = $('#ready-team');
+  var readyPlayer = $('#ready-player');
+  var resultPlayer = $('#result-player');
+  var finalEyebrow = $('#final-eyebrow');
+  var finalTitle  = $('#final-title');
+  var btnAgain    = $('#btn-again');
   var countNum    = $('#count-num');
   var hudTimer    = $('#hud-timer');
   var hudScore    = $('#hud-score');
@@ -48,8 +54,11 @@
   /* -------------------------------------------------------------- stato -- */
 
   var config  = null;
-  var teams   = [];     // [{ name, score, words: [{ word, hit }] }]
-  var turn    = 0;      // indice della squadra di turno
+  var teams   = [];     // [{ name, players, score, roundScore, words }]
+  var turn    = 0;      // indice della squadra dentro il giro
+  var round   = 0;      // indice del giro in corso
+  var rounds  = 1;      // quanti giri dura la partita
+  var over    = false;  // partita conclusa: cambia il tasto della classifica
   var pool    = [];     // tutte le parole delle categorie scelte
   var deck    = [];     // pila da cui si pesca (mescolata, senza ripetizioni)
   var current = null;
@@ -250,9 +259,9 @@
     locked = true;
     var team = teams[turn];
     team.words.push({ word: current, hit: hit });
-    if (hit) team.score++;
+    if (hit) { team.score++; team.roundScore++; }
 
-    hudScore.textContent = team.score;
+    hudScore.textContent = team.roundScore;
     verdictEl.textContent = hit ? '+1' : 'Passo';
     verdictEl.className = 'play__verdict ' + (hit ? 'is-hit' : 'is-miss');
     flash(hit ? 'is-hit' : 'is-miss');
@@ -268,9 +277,17 @@
     });
   }
 
+  /* Le squadre più piccole riciclano i propri giocatori sui giri in eccesso. */
+  function currentPlayer() {
+    var team = teams[turn];
+    return team.players[round % team.players.length];
+  }
+
   function startTurn() {
     var team = teams[turn];
+    readyRound.textContent = 'Giro ' + (round + 1) + ' di ' + rounds;
     readyTeam.textContent = team.name;
+    readyPlayer.textContent = currentPlayer();
     flash(null);
     showView('ready');
   }
@@ -299,7 +316,7 @@
   function startRound() {
     var team = teams[turn];
     team.words = [];
-    team.score = 0;
+    team.roundScore = 0;
 
     showView('play');
     hudScore.textContent = '0';
@@ -353,8 +370,9 @@
     beep(392, 0.5, 'triangle');
 
     var team = teams[turn];
+    resultPlayer.textContent = 'Turno di ' + currentPlayer();
     resultTeam.textContent = team.name;
-    resultScore.textContent = team.score;
+    resultScore.textContent = team.roundScore;
     resultList.innerHTML = team.words.map(function (r) {
       return '<li class="' + (r.hit ? 'is-hit' : 'is-miss') + '">' +
                '<span>' + escapeHtml(r.word) + '</span>' +
@@ -367,11 +385,23 @@
 
   function nextTurn() {
     turn++;
-    if (turn >= teams.length) showFinal();
-    else startTurn();
+    if (turn < teams.length) { startTurn(); return; }
+
+    // Giro completato: tutte le squadre hanno giocato.
+    turn = 0;
+    round++;
+    showStandings(round >= rounds);
   }
 
-  function showFinal() {
+  function showStandings(isFinal) {
+    over = isFinal;
+
+    finalEyebrow.textContent = isFinal
+      ? 'Partita finita'
+      : 'Fine del giro ' + round + ' di ' + rounds;
+    finalTitle.textContent = isFinal ? 'Classifica' : 'Classifica parziale';
+    btnAgain.textContent = isFinal ? 'Rigioca' : 'Vai al giro ' + (round + 1);
+
     var ranking = teams.slice().sort(function (a, b) { return b.score - a.score; });
     var place = 0;
     var prev = null;
@@ -387,20 +417,40 @@
 
     showView('final');   // prima della fanfara: showView azzera i timer in coda
 
-    beep(523, 0.18);
-    after(180, function () { beep(659, 0.18); });
-    after(360, function () { beep(784, 0.4); });
+    if (isFinal) {
+      beep(523, 0.18);
+      after(180, function () { beep(659, 0.18); });
+      after(360, function () { beep(784, 0.4); });
+    } else {
+      beep(587, 0.16);
+    }
   }
 
   /* ------------------------------------------------------------- match --- */
 
   function startMatch(cfg) {
     config = cfg;
-    teams = [];
-    for (var i = 0; i < config.teams; i++) {
-      teams.push({ name: 'Squadra ' + (i + 1), score: 0, words: [] });
-    }
+
+    // I campi lasciati vuoti nel setup ricadono sui nomi di default.
+    teams = (config.rosters || []).map(function (r, i) {
+      var players = (r.players || []).map(function (p, j) {
+        return String(p || '').trim() || ('Giocatore ' + (j + 1));
+      });
+      if (!players.length) players = ['Giocatore 1'];
+
+      return {
+        name: String(r.name || '').trim() || ('Squadra ' + (i + 1)),
+        players: players,
+        score: 0,
+        roundScore: 0,
+        words: []
+      };
+    });
+
+    rounds = teams.reduce(function (max, t) { return Math.max(max, t.players.length); }, 1);
+    round = 0;
     turn = 0;
+    over = false;
     tilt = null;
     sensorSeen = false;
     manualBox.hidden = true;
@@ -441,7 +491,10 @@
   });
 
   $('#btn-next').addEventListener('click', nextTurn);
-  $('#btn-again').addEventListener('click', function () { startMatch(config); });
+  btnAgain.addEventListener('click', function () {
+    if (over) startMatch(config);   // nuova partita con le stesse impostazioni
+    else startTurn();               // si riparte col giro successivo
+  });
   $('#btn-quit').addEventListener('click', quitMatch);
   $('#btn-home').addEventListener('click', quitMatch);
 

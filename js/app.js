@@ -25,9 +25,13 @@
 
   var STORAGE_KEY = 'quizhead:setup';
 
+  var MIN_PLAYERS = 1;
+  var MAX_PLAYERS = 8;
+  var DEFAULT_PLAYERS = 3;
+
   var config = {
     teams: 2,
-    players: 3,
+    rosters: [],          // [{ name, players: [] }], sempre lungo config.teams
     duration: 60,
     categories: []
   };
@@ -40,6 +44,8 @@
   var screenGame   = $('#screen-game');
   var chipsBox     = $('#chips-categories');
   var catCounter   = $('#cat-counter');
+  var rostersBox   = $('#rosters');
+  var roundsNote   = $('#rounds-note');
   var btnToggleAll = $('#btn-toggle-all');
   var btnStart     = $('#btn-start');
   var alertBox     = $('#setup-alert');
@@ -49,6 +55,12 @@
   /* ------------------------------------------------------------- utility -- */
 
   function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
+
+  function attr(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
 
   function buzz(ms) {
     if (navigator.vibrate) { try { navigator.vibrate(ms || 8); } catch (e) {} }
@@ -72,9 +84,17 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       var saved = JSON.parse(raw);
-      if (typeof saved.teams === 'number')    config.teams = clamp(saved.teams, 2, 8);
-      if (typeof saved.players === 'number')  config.players = clamp(saved.players, 1, 10);
+      if (typeof saved.teams === 'number') config.teams = clamp(saved.teams, 2, 8);
       if ([60, 90, 120].indexOf(saved.duration) !== -1) config.duration = saved.duration;
+
+      if (Array.isArray(saved.rosters)) {
+        config.rosters = saved.rosters.slice(0, 8).map(function (r) {
+          var players = Array.isArray(r && r.players) ? r.players : [];
+          players = players.slice(0, MAX_PLAYERS).map(function (p) { return String(p || ''); });
+          while (players.length < MIN_PLAYERS) players.push('');
+          return { name: String((r && r.name) || ''), players: players };
+        });
+      }
       if (Array.isArray(saved.categories)) {
         config.categories = saved.categories.filter(function (id) {
           return CATEGORIES.some(function (c) { return c.id === id; });
@@ -122,13 +142,67 @@
     if (!isEmpty) hideAlert();
   }
 
+  /* ------------------------------------------------------------ rose --- */
+
+  function makeRoster() {
+    var players = [];
+    while (players.length < DEFAULT_PLAYERS) players.push('');
+    return { name: '', players: players };
+  }
+
+  /* Il numero di giri è dettato dalla squadra più numerosa: le squadre più
+     piccole riciclano i propri giocatori. */
+  function roundsCount() {
+    return config.rosters.reduce(function (max, r) {
+      return Math.max(max, r.players.length);
+    }, 1);
+  }
+
+  function syncRosters() {
+    while (config.rosters.length < config.teams) config.rosters.push(makeRoster());
+    config.rosters.length = config.teams;
+    renderRosters();
+  }
+
+  function renderRosters() {
+    rostersBox.innerHTML = config.rosters.map(function (team, t) {
+      var last = team.players.length <= MIN_PLAYERS;
+
+      var rows = team.players.map(function (player, i) {
+        return '<li class="roster__row">' +
+                 '<input type="text" class="roster__player" maxlength="18" autocomplete="off"' +
+                   ' value="' + attr(player) + '" placeholder="Giocatore ' + (i + 1) + '"' +
+                   ' aria-label="Giocatore ' + (i + 1) + ' della squadra ' + (t + 1) + '"' +
+                   ' data-team="' + t + '" data-player="' + i + '">' +
+                 '<button type="button" class="roster__del" data-team="' + t + '" data-player="' + i + '"' +
+                   ' aria-label="Togli il giocatore ' + (i + 1) + '"' + (last ? ' disabled' : '') + '>×</button>' +
+               '</li>';
+      }).join('');
+
+      return '<div class="roster">' +
+               '<input type="text" class="roster__team" maxlength="18" autocomplete="off"' +
+                 ' value="' + attr(team.name) + '" placeholder="Squadra ' + (t + 1) + '"' +
+                 ' aria-label="Nome della squadra ' + (t + 1) + '" data-team="' + t + '">' +
+               '<ul class="roster__list">' + rows + '</ul>' +
+               (team.players.length < MAX_PLAYERS
+                 ? '<button type="button" class="linkbtn roster__add" data-team="' + t + '">+ Aggiungi giocatore</button>'
+                 : '') +
+             '</div>';
+    }).join('');
+
+    var giri = roundsCount();
+    roundsNote.textContent = giri === 1
+      ? 'Partita da 1 giro'
+      : 'Partita da ' + giri + ' giri: ogni giocatore tiene il telefono una volta';
+  }
+
   /* ------------------------------------------------------------ stepper --- */
 
-  function setupSteppers() {
+  function setupSteppers(onChange) {
     var steppers = document.querySelectorAll('[data-stepper]');
 
     Array.prototype.forEach.call(steppers, function (el) {
-      var key = el.dataset.stepper === 'teams' ? 'teams' : 'players';
+      var key = el.dataset.stepper;
       var min = parseInt(el.dataset.min, 10);
       var max = parseInt(el.dataset.max, 10);
       var out = el.querySelector('.stepper__value');
@@ -147,6 +221,7 @@
           config[key] = clamp(config[key] + parseInt(b.dataset.step, 10), min, max);
           buzz();
           paint();
+          if (onChange) onChange(key);
           saveConfig();
         });
       });
@@ -211,7 +286,13 @@
     window.scrollTo(0, 0);
 
     // js/game.js prende di qui la configurazione e parte sull'evento.
-    window.QuizHead.config = Object.assign({}, config, { categories: config.categories.slice() });
+    // Copia profonda: il motore non deve vedere le modifiche fatte al setup.
+    window.QuizHead.config = Object.assign({}, config, {
+      categories: config.categories.slice(),
+      rosters: config.rosters.map(function (r) {
+        return { name: r.name, players: r.players.slice() };
+      })
+    });
     document.dispatchEvent(new CustomEvent('quizhead:start', { detail: window.QuizHead.config }));
   }
 
@@ -224,6 +305,46 @@
   }
 
   /* ----------------------------------------------------------- listener --- */
+
+  /* Aggiorna il modello mentre si scrive, senza ridisegnare: un re-render
+     a ogni tasto farebbe perdere il focus del campo. */
+  rostersBox.addEventListener('input', function (e) {
+    var el = e.target;
+    var t = parseInt(el.dataset.team, 10);
+    if (isNaN(t) || !config.rosters[t]) return;
+
+    if (el.classList.contains('roster__team')) {
+      config.rosters[t].name = el.value;
+    } else if (el.classList.contains('roster__player')) {
+      config.rosters[t].players[parseInt(el.dataset.player, 10)] = el.value;
+    }
+    saveConfig();
+  });
+
+  rostersBox.addEventListener('click', function (e) {
+    var add = e.target.closest('.roster__add');
+    var del = e.target.closest('.roster__del');
+
+    if (add) {
+      var t = parseInt(add.dataset.team, 10);
+      if (config.rosters[t].players.length >= MAX_PLAYERS) return;
+      config.rosters[t].players.push('');
+      renderRosters();
+      buzz();
+      saveConfig();
+
+      var fields = rostersBox.querySelectorAll('.roster__player[data-team="' + t + '"]');
+      if (fields.length) fields[fields.length - 1].focus();
+
+    } else if (del) {
+      var dt = parseInt(del.dataset.team, 10);
+      if (config.rosters[dt].players.length <= MIN_PLAYERS) return;
+      config.rosters[dt].players.splice(parseInt(del.dataset.player, 10), 1);
+      renderRosters();
+      buzz();
+      saveConfig();
+    }
+  });
 
   chipsBox.addEventListener('change', function () {
     readCategories();
@@ -282,6 +403,7 @@
   loadConfig();
   renderCategories();
   syncCategoriesUI();
-  setupSteppers();
+  syncRosters();
+  setupSteppers(function (key) { if (key === 'teams') syncRosters(); });
   setupDuration();
 })();

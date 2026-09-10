@@ -221,6 +221,78 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 }
 
 /* --------------------------------------------------------------------------
+   Rose delle squadre
+   -------------------------------------------------------------------------- */
+
+.rosters { display: flex; flex-direction: column; gap: 10px; }
+
+.roster {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, .2);
+}
+.roster + .roster { margin-top: 2px; }
+
+.roster__list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.roster__row { display: flex; align-items: center; gap: 7px; }
+
+/* 16px pieni: sotto questa soglia iOS zooma la pagina al focus */
+.roster__team,
+.roster__player {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  transition: border-color .2s, background .2s;
+}
+.roster__team {
+  font-weight: 800;
+  letter-spacing: -.01em;
+  background: var(--surface-hi);
+}
+.roster__team::placeholder,
+.roster__player::placeholder { color: var(--muted); opacity: .65; }
+
+.roster__team:focus,
+.roster__player:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent-2) 65%, transparent);
+  background: var(--surface-hi);
+}
+
+.roster__del {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-hi);
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  transition: transform .12s var(--ease), opacity .2s, color .2s;
+}
+.roster__del:active { transform: scale(.88); color: var(--danger); }
+.roster__del:disabled { opacity: .22; cursor: default; transform: none; }
+
+.roster__add { margin-top: 9px; }
+
+/* --------------------------------------------------------------------------
    Segmented control (timer)
    -------------------------------------------------------------------------- */
 
@@ -452,6 +524,16 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
   font-weight: 900;
   letter-spacing: -.03em;
   line-height: 1.05;
+}
+
+.view__player {
+  margin: -6px 0 0;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+.view__player strong {
+  color: var(--mint);
+  font-weight: 800;
 }
 
 .view__hint {
