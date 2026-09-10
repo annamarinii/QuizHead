@@ -70,6 +70,18 @@
         </div>
       </section>
 
+      <!-- Penitenze -->
+      <section class="card card--tight">
+        <label class="toggle">
+          <input type="checkbox" id="opt-dares" checked>
+          <span class="toggle__track"><span class="toggle__knob"></span></span>
+          <span class="toggle__text">
+            <strong>Penitenze</strong>
+            <small>A fine giro chi ha fatto meno punti paga pegno</small>
+          </span>
+        </label>
+      </section>
+
       <!-- Categorie -->
       <section class="card" aria-labelledby="lbl-cat">
         <div class="card__head">
@@ -161,6 +173,17 @@
         </div>
       </section>
 
+
+      <!-- F · penitenza -->
+      <section class="view" id="view-dare" hidden>
+        <p class="view__eyebrow" id="dare-eyebrow">Penitenza</p>
+        <h2 class="view__team" id="dare-team">Squadra 1</h2>
+        <p class="dare" id="dare-text"></p>
+        <div class="view__actions">
+          <button type="button" class="btn btn--primary" id="btn-dare-done">Avanti</button>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -169,6 +192,7 @@
   </noscript>
 
   <script src="js/words.js"></script>
+  <script src="js/dares.js"></script>
   <script src="js/game.js"></script>
   <script src="js/app.js"></script>
 </body>

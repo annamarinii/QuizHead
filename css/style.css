@@ -159,6 +159,59 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 }
 .card__note.is-empty { color: var(--danger); }
 
+.card--tight { padding: 14px 16px; }
+
+/* --------------------------------------------------------------------------
+   Interruttore
+   -------------------------------------------------------------------------- */
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  cursor: pointer;
+}
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle__track {
+  flex: none;
+  position: relative;
+  width: 52px;
+  height: 31px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .35);
+  border: 1px solid var(--border);
+  transition: background .22s var(--ease), border-color .22s;
+}
+.toggle__knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform .22s var(--ease), background .22s;
+}
+.toggle input:checked + .toggle__track {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+}
+.toggle input:checked + .toggle__track .toggle__knob {
+  transform: translateX(21px);
+  background: #fff;
+}
+.toggle input:focus-visible + .toggle__track { outline: 2px solid var(--text); outline-offset: 2px; }
+
+.toggle__text { display: flex; flex-direction: column; min-width: 0; }
+.toggle__text strong { font-weight: 700; font-size: 1rem; }
+.toggle__text small { font-size: .78rem; color: var(--muted); line-height: 1.35; }
+
 .linkbtn {
   background: none;
   border: 0;
@@ -702,6 +755,21 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .wordlist .is-miss  { background: color-mix(in srgb, var(--danger) 13%, transparent); color: var(--muted); }
 .wordlist .is-empty { justify-content: center; color: var(--muted); }
 .wordlist i { font-style: normal; font-weight: 700; }
+
+/* ------------------------------------------------------------ penitenza -- */
+
+.dare {
+  width: min(100%, 460px);
+  margin: 6px 0 0;
+  padding: 20px 22px;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 55%, transparent);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--accent-2) 15%, transparent);
+  font-size: clamp(1.1rem, 4.2vmin, 1.5rem);
+  font-weight: 700;
+  line-height: 1.35;
+  text-wrap: balance;
+}
 
 /* ------------------------------------------------------------ classifica -- */
 

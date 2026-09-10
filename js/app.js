@@ -32,6 +32,7 @@
     teams: 2,
     rosters: [],          // [{ name, players: [] }], sempre lungo config.teams
     duration: 60,
+    dares: true,
     categories: []
   };
 
@@ -44,6 +45,7 @@
   var chipsBox     = $('#chips-categories');
   var catCounter   = $('#cat-counter');
   var rostersBox   = $('#rosters');
+  var daresBox     = $('#opt-dares');
   var roundsNote   = $('#rounds-note');
   var btnToggleAll = $('#btn-toggle-all');
   var btnStart     = $('#btn-start');
@@ -85,6 +87,7 @@
       var saved = JSON.parse(raw);
       if (typeof saved.teams === 'number') config.teams = clamp(saved.teams, 2, 8);
       if ([60, 90, 120].indexOf(saved.duration) !== -1) config.duration = saved.duration;
+      if (typeof saved.dares === 'boolean') config.dares = saved.dares;
 
       if (Array.isArray(saved.rosters)) {
         config.rosters = saved.rosters.slice(0, 8).map(function (r) {
@@ -241,6 +244,17 @@
         buzz();
         saveConfig();
       });
+    });
+  }
+
+  /* ---------------------------------------------------------- penitenze --- */
+
+  function setupDares() {
+    daresBox.checked = config.dares;
+    daresBox.addEventListener('change', function () {
+      config.dares = daresBox.checked;
+      buzz();
+      saveConfig();
     });
   }
 
@@ -405,4 +419,5 @@
   syncRosters();
   setupSteppers(function (key) { if (key === 'teams') syncRosters(); });
   setupDuration();
+  setupDares();
 })();

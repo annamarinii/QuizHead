@@ -30,7 +30,8 @@
     count:  $('#view-count'),
     play:   $('#view-play'),
     result: $('#view-result'),
-    final:  $('#view-final')
+    final:  $('#view-final'),
+    dare:   $('#view-dare')
   };
 
   var readyRound  = $('#ready-round');
@@ -51,6 +52,10 @@
   var resultScore = $('#result-score');
   var resultList  = $('#result-list');
   var leaderboard = $('#leaderboard');
+  var dareEyebrow = $('#dare-eyebrow');
+  var dareTeam    = $('#dare-team');
+  var dareText    = $('#dare-text');
+  var btnDareDone = $('#btn-dare-done');
 
   /* -------------------------------------------------------------- stato -- */
 
@@ -62,6 +67,8 @@
   var over    = false;  // partita conclusa: cambia il tasto della classifica
   var pool    = [];     // tutte le parole delle categorie scelte
   var deck    = [];     // pila da cui si pesca (mescolata, senza ripetizioni)
+  var dareDeck = [];    // stessa logica, per le penitenze
+  var darePending = false;
   var current = null;
 
   var running  = false;
@@ -416,7 +423,11 @@
       ? 'Partita finita'
       : 'Fine del giro ' + round + ' di ' + rounds;
     finalTitle.textContent = isFinal ? 'Classifica' : 'Classifica parziale';
-    btnAgain.textContent = isFinal ? 'Rigioca' : 'Vai al giro ' + (round + 1);
+
+    darePending = config.dares !== false && pickLosers().length > 0;
+    btnAgain.textContent = darePending
+      ? 'Penitenza'
+      : (isFinal ? 'Rigioca' : 'Vai al giro ' + (round + 1));
 
     var ranking = teams.slice().sort(function (a, b) { return b.score - a.score; });
     var place = 0;
@@ -440,6 +451,50 @@
     } else {
       beep(587, 0.16);
     }
+  }
+
+  /* --------------------------------------------------------- penitenze --- */
+
+  function drawDare() {
+    var all = (window.QuizHead && window.QuizHead.dares) || [];
+    if (!all.length) return '';
+    if (!dareDeck.length) dareDeck = shuffle(all.slice());
+    return dareDeck.pop();
+  }
+
+  /* Paga pegno chi ha fatto meno punti: nel giro appena chiuso, o in totale
+     se la partita è finita. Se sono tutte pari non c'è un ultimo: si salta. */
+  function pickLosers() {
+    if (teams.length < 2) return [];
+    var key = over ? 'score' : 'roundScore';
+    var min = Math.min.apply(null, teams.map(function (t) { return t[key]; }));
+    var losers = teams.filter(function (t) { return t[key] === min; });
+    return losers.length === teams.length ? [] : losers;
+  }
+
+  function joinNames(list) {
+    var names = list.map(function (t) { return t.name; });
+    if (names.length < 2) return names[0] || '';
+    return names.slice(0, -1).join(', ') + ' e ' + names[names.length - 1];
+  }
+
+  function showDare() {
+    var losers = pickLosers();
+    darePending = false;
+
+    dareEyebrow.textContent = over ? 'Penitenza finale' : 'Penitenza del giro ' + round;
+    dareTeam.textContent = joinNames(losers);
+    dareText.textContent = drawDare();
+    btnDareDone.textContent = over ? 'Rigioca' : 'Vai al giro ' + (round + 1);
+
+    showView('dare');
+    buzz([50, 70, 50, 70, 120]);
+    beep(233, 0.4, 'sawtooth');
+  }
+
+  function proceed() {
+    if (over) startMatch(config);   // nuova partita con le stesse impostazioni
+    else startTurn();               // si riparte col giro successivo
   }
 
   /* ------------------------------------------------------------- match --- */
@@ -467,6 +522,8 @@
     round = 0;
     turn = 0;
     over = false;
+    darePending = false;
+    dareDeck = [];
     tilt = null;
     sensorSeen = false;
     manualBox.hidden = true;
@@ -508,9 +565,11 @@
 
   $('#btn-next').addEventListener('click', nextTurn);
   btnAgain.addEventListener('click', function () {
-    if (over) startMatch(config);   // nuova partita con le stesse impostazioni
-    else startTurn();               // si riparte col giro successivo
+    if (darePending) showDare();
+    else proceed();
   });
+
+  btnDareDone.addEventListener('click', proceed);
   $('#btn-quit').addEventListener('click', quitMatch);
   $('#btn-home').addEventListener('click', quitMatch);
 
