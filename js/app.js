@@ -18,7 +18,6 @@
     { id: 'canzoni',     label: 'Canzoni',     icon: '🎵' },
     { id: 'mimo',        label: 'Mimo',        icon: '🎭' },
     { id: 'informatica', label: 'Informatica', icon: '💻' },
-    { id: 'serietv',     label: 'Serie TV',    icon: '📺' },
     // Categoria "di casa": nomi di persone che conosciamo, forniti a mano.
     { id: 'persone',     label: 'Persone',     icon: '👥' }
   ];
