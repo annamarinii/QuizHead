@@ -1,165 +1,179 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Quiz</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: system-ui, sans-serif;
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
-            transition: background-color 0.4s;
-            overflow: hidden;
-        }
-        #word-display {
-            font-size: 4rem;
-            font-weight: bold;
-            margin: 20px;
-            display: none;
-        }
-        #timer {
-            font-size: 2rem;
-            position: absolute;
-            top: 30px;
-            display: none;
-        }
-        button {
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            border: none;
-            border-radius: 10px;
-            background-color: #3498db;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0d0619">
+  <meta name="description" content="QuizHead — indovina la parola sulla tua fronte. Inclina in avanti per indovinare, indietro per passare.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>QuizHead</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div id="timer">60</div>
-    <button id="start-btn">Inizia Partita</button>
-    <div id="word-display">Preparati...</div>
+  <!-- ============================================================
+       SCHERMATA 1 — SETUP
+       ============================================================ -->
+  <main class="screen screen--setup" id="screen-setup">
 
-    <script>
-        // Inserisci qui i termini personalizzati
-        const terms = [
-            "Rivoluzione Francese", "Socrate", "Mitosi", 
-            "Impero Romano", "Kant", "Apparato Circolatorio",
-            "Guerra Fredda", "Platone", "Sistema Nervoso"
-        ];
-        
-        let gameWords = [];
-        let isPlaying = false;
-        let canGuess = true;
-        let score = 0;
+    <header class="hero">
+      <h1 class="hero__logo">Quiz<span>Head</span></h1>
+      <p class="hero__tagline">Telefono sulla fronte. Avanti per indovinare, indietro per passare.</p>
+    </header>
 
-        const startBtn = document.getElementById('start-btn');
-        const wordDisplay = document.getElementById('word-display');
-        const timerDisplay = document.getElementById('timer');
+    <div class="stack">
 
-        startBtn.addEventListener('click', async () => {
-            // I dispositivi iOS richiedono un'interazione esplicita per i sensori
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try {
-                    const permissionState = await DeviceOrientationEvent.requestPermission();
-                    if (permissionState === 'granted') {
-                        startGame();
-                    } else {
-                        alert("Permesso per i sensori negato.");
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
-                startGame();
-            }
-        });
+      <!-- Squadre e giocatori -->
+      <section class="card" aria-labelledby="lbl-squadra">
+        <h2 class="card__title" id="lbl-squadra">Chi gioca</h2>
 
-        function startGame() {
-            startBtn.style.display = 'none';
-            wordDisplay.style.display = 'block';
-            timerDisplay.style.display = 'block';
-            
-            gameWords = [...terms].sort(() => 0.5 - Math.random());
-            isPlaying = true;
-            score = 0;
-            document.body.style.backgroundColor = "#34495e";
+        <div class="stepper" data-stepper="teams" data-min="2" data-max="8">
+          <div class="stepper__meta">
+            <span class="stepper__label">Squadre</span>
+            <span class="stepper__hint">min 2 · max 8</span>
+          </div>
+          <div class="stepper__controls">
+            <button type="button" class="stepper__btn" data-step="-1" aria-label="Diminuisci numero di squadre">−</button>
+            <output class="stepper__value" id="out-teams" aria-live="polite">2</output>
+            <button type="button" class="stepper__btn" data-step="1" aria-label="Aumenta numero di squadre">+</button>
+          </div>
+        </div>
 
-            window.addEventListener('deviceorientation', handleOrientation);
-            
-            nextWord();
-            startTimer(60);
-        }
+        <div class="stepper" data-stepper="players" data-min="1" data-max="10">
+          <div class="stepper__meta">
+            <span class="stepper__label">Giocatori per squadra</span>
+            <span class="stepper__hint">min 1 · max 10</span>
+          </div>
+          <div class="stepper__controls">
+            <button type="button" class="stepper__btn" data-step="-1" aria-label="Diminuisci giocatori per squadra">−</button>
+            <output class="stepper__value" id="out-players" aria-live="polite">3</output>
+            <button type="button" class="stepper__btn" data-step="1" aria-label="Aumenta giocatori per squadra">+</button>
+          </div>
+        </div>
+      </section>
 
-        function nextWord() {
-            if (gameWords.length === 0) {
-                endGame();
-                return;
-            }
-            wordDisplay.textContent = gameWords.pop();
-            canGuess = true;
-        }
+      <!-- Timer -->
+      <section class="card" aria-labelledby="lbl-timer">
+        <h2 class="card__title" id="lbl-timer">Durata del turno</h2>
+        <div class="segmented" role="radiogroup" aria-labelledby="lbl-timer">
+          <label class="segmented__opt">
+            <input type="radio" name="duration" value="60" checked>
+            <span class="segmented__face"><strong>60</strong><small>secondi</small></span>
+          </label>
+          <label class="segmented__opt">
+            <input type="radio" name="duration" value="90">
+            <span class="segmented__face"><strong>90</strong><small>secondi</small></span>
+          </label>
+          <label class="segmented__opt">
+            <input type="radio" name="duration" value="120">
+            <span class="segmented__face"><strong>120</strong><small>secondi</small></span>
+          </label>
+        </div>
+      </section>
 
-        function handleOrientation(event) {
-            if (!isPlaying || !canGuess) return;
+      <!-- Categorie -->
+      <section class="card" aria-labelledby="lbl-cat">
+        <div class="card__head">
+          <h2 class="card__title" id="lbl-cat">Categorie</h2>
+          <button type="button" class="linkbtn" id="btn-toggle-all">Seleziona tutte</button>
+        </div>
+        <div class="chips" id="chips-categories" role="group" aria-labelledby="lbl-cat">
+          <!-- generato da js/app.js -->
+        </div>
+        <p class="card__note" id="cat-counter">0 categorie selezionate</p>
+      </section>
 
-            // beta rileva l'inclinazione fronte/retro tenendo il telefono in verticale
-            const tilt = event.beta; 
+    </div>
 
-            // Inclinazione in avanti (Indovinato - Verde)
-            if (tilt < 40 && tilt > 0) {
-                registerAnswer("#2ecc71", 1);
-            } 
-            // Inclinazione all'indietro (Passo - Rosso)
-            else if (tilt > 140) {
-                registerAnswer("#e74c3c", 0);
-            }
-        }
+    <footer class="launchbar">
+      <p class="alert" id="setup-alert" role="alert" hidden></p>
+      <button type="button" class="btn btn--primary" id="btn-start" disabled>
+        <span>Inizia a giocare</span>
+      </button>
+      <p class="launchbar__legal">Al primo avvio il telefono chiede l'accesso ai sensori di movimento: tocca <strong>Consenti</strong>.</p>
+    </footer>
 
-        function registerAnswer(color, points) {
-            canGuess = false;
-            score += points;
-            document.body.style.backgroundColor = color;
-            
-            setTimeout(() => {
-                document.body.style.backgroundColor = "#34495e";
-                nextWord();
-            }, 1200); // Pausa per far leggere l'esito prima di mostrare la nuova parola
-        }
+  </main>
 
-        function startTimer(seconds) {
-            let timeLeft = seconds;
-            timerDisplay.textContent = timeLeft;
-            
-            const timerId = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                
-                if (timeLeft <= 0 || !isPlaying) {
-                    clearInterval(timerId);
-                    if (isPlaying) endGame();
-                }
-            }, 1000);
-        }
+  <!-- ============================================================
+       SCHERMATA 2 — GIOCO
+       .stage viene ruotato via CSS quando il telefono è fisicamente
+       in orizzontale ma il viewport resta bloccato in verticale.
+       ============================================================ -->
+  <main class="screen screen--game" id="screen-game" hidden>
+    <div class="stage" id="stage">
 
-        function endGame() {
-            isPlaying = false;
-            window.removeEventListener('deviceorientation', handleOrientation);
-            wordDisplay.textContent = `Fine! Punteggio: ${score}`;
-            setTimeout(() => {
-                startBtn.style.display = 'block';
-                startBtn.textContent = "Rigioca";
-            }, 3000);
-        }
-    </script>
+      <!-- A · pronti -->
+      <section class="view" id="view-ready">
+        <p class="view__eyebrow">Tocca a</p>
+        <h2 class="view__team" id="ready-team">Squadra 1</h2>
+        <p class="view__hint">
+          Telefono in orizzontale sulla fronte.<br>
+          Inclina <strong class="t-hit">in avanti</strong> se indovini,
+          <strong class="t-miss">indietro</strong> per passare.
+        </p>
+        <div class="view__actions">
+          <button type="button" class="btn btn--primary" id="btn-ready">Sono pronto</button>
+          <button type="button" class="btn btn--ghost" id="btn-quit">Esci dalla partita</button>
+        </div>
+      </section>
+
+      <!-- B · countdown -->
+      <section class="view" id="view-count" hidden>
+        <p class="count" id="count-num" aria-live="assertive">3</p>
+        <p class="view__hint">Sulla fronte!</p>
+      </section>
+
+      <!-- C · round -->
+      <section class="view view--play" id="view-play" hidden>
+        <div class="hud">
+          <span class="hud__timer" id="hud-timer">60</span>
+          <span class="hud__score" id="hud-score">0</span>
+        </div>
+        <p class="play__word" id="play-word" data-len="m">…</p>
+        <p class="play__verdict" id="play-verdict" aria-live="assertive"></p>
+        <div class="manual" id="manual" hidden>
+          <button type="button" class="manual__btn manual__btn--miss" data-answer="miss">↑ Passo</button>
+          <button type="button" class="manual__btn manual__btn--hit" data-answer="hit">↓ Indovinato</button>
+        </div>
+      </section>
+
+      <!-- D · fine turno -->
+      <section class="view" id="view-result" hidden>
+        <p class="view__eyebrow">Turno finito</p>
+        <h2 class="view__team" id="result-team">Squadra 1</h2>
+        <p class="result__score"><strong id="result-score">0</strong> punti</p>
+        <ul class="wordlist" id="result-list"></ul>
+        <div class="view__actions">
+          <button type="button" class="btn btn--primary" id="btn-next">Avanti</button>
+        </div>
+      </section>
+
+      <!-- E · classifica -->
+      <section class="view" id="view-final" hidden>
+        <p class="view__eyebrow">Partita finita</p>
+        <h2 class="view__team">Classifica</h2>
+        <ol class="leaderboard" id="leaderboard"></ol>
+        <div class="view__actions">
+          <button type="button" class="btn btn--primary" id="btn-again">Rigioca</button>
+          <button type="button" class="btn btn--ghost" id="btn-home">Cambia impostazioni</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <noscript>
+    <p style="padding:24px;color:#fff;font:16px/1.5 system-ui">QuizHead ha bisogno di JavaScript attivo per funzionare.</p>
+  </noscript>
+
+  <script src="js/words.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
