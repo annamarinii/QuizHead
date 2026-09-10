@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Quiz</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, sans-serif;
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            transition: background-color 0.4s;
+            overflow: hidden;
+        }
+        #word-display {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px;
+            display: none;
+        }
+        #timer {
+            font-size: 2rem;
+            position: absolute;
+            top: 30px;
+            display: none;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="timer">60</div>
+    <button id="start-btn">Inizia Partita</button>
+    <div id="word-display">Preparati...</div>
+
+    <script>
+        // Inserisci qui i termini personalizzati
+        const terms = [
+            "Rivoluzione Francese", "Socrate", "Mitosi", 
+            "Impero Romano", "Kant", "Apparato Circolatorio",
+            "Guerra Fredda", "Platone", "Sistema Nervoso"
+        ];
+        
+        let gameWords = [];
+        let isPlaying = false;
+        let canGuess = true;
+        let score = 0;
+
+        const startBtn = document.getElementById('start-btn');
+        const wordDisplay = document.getElementById('word-display');
+        const timerDisplay = document.getElementById('timer');
+
+        startBtn.addEventListener('click', async () => {
+            // I dispositivi iOS richiedono un'interazione esplicita per i sensori
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    const permissionState = await DeviceOrientationEvent.requestPermission();
+                    if (permissionState === 'granted') {
+                        startGame();
+                    } else {
+                        alert("Permesso per i sensori negato.");
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                startGame();
+            }
+        });
+
+        function startGame() {
+            startBtn.style.display = 'none';
+            wordDisplay.style.display = 'block';
+            timerDisplay.style.display = 'block';
+            
+            gameWords = [...terms].sort(() => 0.5 - Math.random());
+            isPlaying = true;
+            score = 0;
+            document.body.style.backgroundColor = "#34495e";
+
+            window.addEventListener('deviceorientation', handleOrientation);
+            
+            nextWord();
+            startTimer(60);
+        }
+
+        function nextWord() {
+            if (gameWords.length === 0) {
+                endGame();
+                return;
+            }
+            wordDisplay.textContent = gameWords.pop();
+            canGuess = true;
+        }
+
+        function handleOrientation(event) {
+            if (!isPlaying || !canGuess) return;
+
+            // beta rileva l'inclinazione fronte/retro tenendo il telefono in verticale
+            const tilt = event.beta; 
+
+            // Inclinazione in avanti (Indovinato - Verde)
+            if (tilt < 40 && tilt > 0) {
+                registerAnswer("#2ecc71", 1);
+            } 
+            // Inclinazione all'indietro (Passo - Rosso)
+            else if (tilt > 140) {
+                registerAnswer("#e74c3c", 0);
+            }
+        }
+
+        function registerAnswer(color, points) {
+            canGuess = false;
+            score += points;
+            document.body.style.backgroundColor = color;
+            
+            setTimeout(() => {
+                document.body.style.backgroundColor = "#34495e";
+                nextWord();
+            }, 1200); // Pausa per far leggere l'esito prima di mostrare la nuova parola
+        }
+
+        function startTimer(seconds) {
+            let timeLeft = seconds;
+            timerDisplay.textContent = timeLeft;
+            
+            const timerId = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0 || !isPlaying) {
+                    clearInterval(timerId);
+                    if (isPlaying) endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            window.removeEventListener('deviceorientation', handleOrientation);
+            wordDisplay.textContent = `Fine! Punteggio: ${score}`;
+            setTimeout(() => {
+                startBtn.style.display = 'block';
+                startBtn.textContent = "Rigioca";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
